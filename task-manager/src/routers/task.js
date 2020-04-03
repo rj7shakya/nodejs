@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const task = require('../models/task')
+const Task = require('../models/task')
 
 router.post('/tasks', async (req, res) => {
   const task = new Task(req.body);
@@ -44,11 +44,15 @@ router.patch('/tasks/:id', async (req, res) => {
     res.status(400).send({ error: 'Invalid updates!' })
   }
   try {
-    const tasks = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
-    if (!tasks) {
+    const task = await Task.findById(req.params.id);
+    updates.forEach((update) => task[update] = req.body[update])
+    await task.save()
+
+    // const tasks = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+    if (!task) {
       res.status(404).send()
     }
-    res.send(tasks)
+    res.send(task)
   } catch (e) {
     res.status(500).send(e)
   }
