@@ -13,7 +13,7 @@ const locationTemplate = document.querySelector('#location-template').innerHTML
 
 
 //options
-const { username, room } = Os.parse(location.search, { ignoreQueryPrefix: true })
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
 socket.on('message', (message) => {
   console.log(message)

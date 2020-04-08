@@ -4,6 +4,7 @@ const path = require('path')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocation } = require('./utils/messages')
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
 
 const app = express()
 const server = http.createServer(app)
@@ -17,8 +18,14 @@ app.use(express.static(publicDirectoryPath))
 io.on('connection', (socket) => {
   console.log('New Websocket connection')
 
-  socket.emit('message', generateMessage('Welcome!'));
-  socket.broadcast.emit('message', generateMessage('A new user has joined'))
+
+  socket.on('join', ({ username, room }) => {
+    socket.join(room)
+    socket.emit('message', generateMessage('Welcome!'));
+    socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined`))
+
+
+  })
 
   socket.on('sendMessage', (message, callback) => {
     const filter = new Filter();
